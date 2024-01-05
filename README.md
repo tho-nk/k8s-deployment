@@ -10,13 +10,34 @@ kind create cluster --config ./clusters/kind/kind-config.yaml --name massy-clust
 
 ## 2. Apply Kubernetes Manifests
 
+If you want to apply them to a specific namespace, you can use the --namespace flag:
+
+```
+kubectl create namespace massy-rendering
+kubectl config set-context --current --namespace=massy-rendering
+
+kubectl delete all --all -n massy-rendering
+```
+
+
+
 Apply the Kubernetes manifests for your project components. You can organize these manifests into directories, such as deployments, services, etc.
 
 ```
-kubectl apply -f deployments/nkAnimation/nkAnimation.yaml
-kubectl apply -f deployments/nkApplication/nkApplication.yaml
-kubectl apply -f deployments/nkConnect/nkConnect.yaml
-kubectl apply -f deployments/nkConnect-Database/nkConnect-Database.yaml
+kubectl apply -f deployments/nkAnimation/nkAnimation.yaml --namespace massy-rendering
+kubectl apply -f deployments/nkApplication/nkApplication.yaml --namespace massy-rendering
+kubectl apply -f deployments/nkConnect/nkConnect.yaml --namespace massy-rendering
+kubectl apply -f deployments/nkDataProvider/nkDataProvider.yaml --namespace massy-rendering
+```
+
+You can apply all the YAML files in your deployment folder at once using the kubectl apply command with the -f option and specifying the directory path. Here's how you can do it:
+
+```
+kubectl apply -f deployments/*/*.yaml
+```
+
+```
+kubectl apply -f deployments/*/*.yaml --namespace massy-rendering
 ```
 
 ## 3. Monitor Cluster and Pods
@@ -46,5 +67,8 @@ Once the external IP is assigned, you can access your services using that IP.
 When you're done testing your project, you can delete the Kind cluster:
 
 ```
-kind delete cluster --name your-cluster-name
+kind delete cluster --name massy-cluster
+kubectl delete service nkconnect-service
+kubectl delete deployment nkconnect-deployment
+kubectl delete pod nkconnect
 ```
